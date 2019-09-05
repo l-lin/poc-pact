@@ -1,0 +1,12 @@
+{
+  "name": "petstore",
+  "version": "0.0.1-SNAPSHOT",
+  "devDependencies": {
+    "swagger-cli": "2.3.1",
+    "redoc-cli": "0.8.6"
+  },
+  "scripts": {
+    "build": "redoc-cli bundle src/main/resources/static/openapi.yaml --output build/static/index.html",
+    "validate": "swagger-cli validate src/main/resources/static/openapi.yaml"
+  }
+}

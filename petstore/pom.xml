@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.7.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>lin.louis.poc.pact</groupId>
+	<artifactId>petstore</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>petstore</name>
+	<description>Demo project as provider</description>
+
+	<properties>
+		<java.version>11</java.version>
+		<node.version>v12.9.1</node.version>
+		<yarn.version>v1.17.3</yarn.version>
+
+		<!-- contract tests properties-->
+		<skipITs>true</skipITs>
+		<pact.verifier.publishResult>true</pact.verifier.publishResult>
+		<pactbroker.scheme>http</pactbroker.scheme>
+		<pactbroker.host>localhost</pactbroker.host>
+		<pactbroker.port>9292</pactbroker.port>
+
+		<!-- dependencies -->
+		<frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
+		<junit-jupiter.version>5.5.1</junit-jupiter.version>
+		<pact-jvm-provider.version>3.5.20</pact-jvm-provider.version>
+		<springdoc-openapi.version>1.1.33</springdoc-openapi.version>
+		<swagger-request-validator.version>2.5.0</swagger-request-validator.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- RUNTIME -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- TEST -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.oai</groupId>
+			<artifactId>swagger-request-validator-pact</artifactId>
+			<version>${swagger-request-validator.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- PACT -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-provider_2.12</artifactId>
+			<version>${pact-jvm-provider.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- this plugin cannot publish with provider tag -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-provider-junit5_2.12</artifactId>
+			<version>${pact-jvm-provider.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- this plugin does not work with junit5 -->
+		<!--dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-provider-spring_2.12</artifactId>
+			<version>${pact-jvm-provider.version}</version>
+			<scope>test</scope>
+		</dependency-->
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/build</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${project.basedir}/build/static</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<!-- validate OAS file and generate the ReDoc HTML documentation file -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>${frontend-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>install node and yarn</id>
+						<goals>
+							<goal>install-node-and-yarn</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>yarn install</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>build redoc</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>run validate build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+					<yarnVersion>${yarn.version}</yarnVersion>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>contract test</id>
+						<phase>integration-test</phase>
+						<goals><goal>integration-test</goal></goals>
+						<configuration>
+							<includes>
+								<include>**/*TestAPI.java</include>
+							</includes>
+							<systemProperties>
+								<pact.provider.version>${project.version}</pact.provider.version>
+								<pact.verifier.publishResult>${pact.verifier.publishResult}</pact.verifier.publishResult>
+								<pactbroker.host>${pactbroker.host}</pactbroker.host>
+								<pactbroker.port>${pactbroker.port}</pactbroker.port>
+							</systemProperties>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<skipTests>${skipITs}</skipTests>
+				</configuration>
+			</plugin>
+			<!-- this plugin performs http requests directly, meaning we must have a running environment to have the test-->
+			<!-- mvn pact:verify to check pact -->
+			<!-- mvn pact:publish to publish provider pact file -->
+			<!--plugin>
+				<groupId>au.com.dius</groupId>
+				<artifactId>pact-jvm-provider-maven_2.12</artifactId>
+				<version>${pact-jvm-provider.version}</version>
+				<configuration>
+					<pactBrokerUrl>${pactbroker.scheme}://${pactbroker.host}:${pactbroker.port}</pactBrokerUrl>
+					<serviceProviders>
+						<serviceProvider>
+							<name>petstore</name>
+							<pactBrokerUrl>${pactbroker.scheme}://${pactbroker.host}:${pactbroker.port}</pactBrokerUrl>
+						</serviceProvider>
+					</serviceProviders>
+				</configuration>
+			</plugin-->
+		</plugins>
+	</build>
+</project>

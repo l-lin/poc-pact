@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    healthcheck:
+      test: psql postgres --command "select 1" -U postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pact
+
+  pact_broker:
+    image: pactfoundation/pact-broker:2.36.1-1
+    entrypoint: /wait-for.sh
+    command: ["db:5432", "--", "./entrypoint.sh", "config.ru"]
+    ports:
+      - "9292:9292"
+    depends_on:
+      - db
+    environment:
+      PACT_BROKER_DATABASE_USERNAME: postgres
+      PACT_BROKER_DATABASE_PASSWORD: password
+      PACT_BROKER_DATABASE_HOST: db
+      PACT_BROKER_DATABASE_NAME: pact
+      PACT_BROKER_PORT: "9292"
+    volumes:
+      - ./docker/scripts/wait-for.sh:/wait-for.sh
+
