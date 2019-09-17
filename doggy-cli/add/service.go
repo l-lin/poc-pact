@@ -23,7 +23,7 @@ func (s *Service) Add(c dog.Dog) (*dog.Dog, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := http.Post(url, "application/json", bytes.NewReader(reqBody))
+	resp, err := http.Post(url, "application/json;charset=UTF-8", bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}

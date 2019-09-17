@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import lin.louis.poc.pact.petstore.PetNoFoundException;
-
 
 @RestController
 @RequestMapping(path = "/cats")
@@ -25,7 +23,7 @@ public class CatController {
 	@GetMapping(path = "/{id}")
 	public Cat get(@PathVariable long id) {
 		return catRepository.findById(id)
-				.orElseThrow(() -> new PetNoFoundException(id));
+				.orElseThrow(() -> new NullPointerException("Cat not found for id " + id));
 	}
 
 	@PostMapping

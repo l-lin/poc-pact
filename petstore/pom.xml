@@ -20,17 +20,18 @@
 		<yarn.version>v1.17.3</yarn.version>
 
 		<!-- contract tests properties-->
-		<skipITs>true</skipITs>
-		<pact.verifier.publishResult>true</pact.verifier.publishResult>
+		<pact.verifier.publishResults>true</pact.verifier.publishResults>
 		<pactbroker.scheme>http</pactbroker.scheme>
 		<pactbroker.host>localhost</pactbroker.host>
 		<pactbroker.port>9292</pactbroker.port>
+		<pactbroker.url>${pactbroker.scheme}://${pactbroker.host}:${pactbroker.port}</pactbroker.url>
 
 		<!-- dependencies -->
 		<frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
 		<junit-jupiter.version>5.5.1</junit-jupiter.version>
 		<pact-jvm-provider.version>3.5.20</pact-jvm-provider.version>
 		<springdoc-openapi.version>1.1.33</springdoc-openapi.version>
+		<spring-cloud-contract.version>2.1.3.RELEASE</spring-cloud-contract.version>
 		<swagger-request-validator.version>2.5.0</swagger-request-validator.version>
 	</properties>
 
@@ -66,18 +67,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${junit-jupiter.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.oai</groupId>
@@ -85,6 +74,7 @@
 			<version>${swagger-request-validator.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- PACT -->
 		<dependency>
 			<groupId>au.com.dius</groupId>
@@ -95,23 +85,25 @@
 		<!-- this plugin cannot publish with provider tag -->
 		<dependency>
 			<groupId>au.com.dius</groupId>
-			<artifactId>pact-jvm-provider-junit5_2.12</artifactId>
+			<artifactId>pact-jvm-provider-junit_2.12</artifactId>
 			<version>${pact-jvm-provider.version}</version>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- this plugin does not work with junit5 -->
-		<!--dependency>
+		<dependency>
 			<groupId>au.com.dius</groupId>
 			<artifactId>pact-jvm-provider-spring_2.12</artifactId>
 			<version>${pact-jvm-provider.version}</version>
 			<scope>test</scope>
-		</dependency-->
+		</dependency>
+
+		<!-- SPRING CLOUD CONTRACT -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-contract-verifier</artifactId>
+			<version>${spring-cloud-contract.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -177,48 +169,102 @@
 					<yarnVersion>${yarn.version}</yarnVersion>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>contract test</id>
-						<phase>integration-test</phase>
-						<goals><goal>integration-test</goal></goals>
-						<configuration>
-							<includes>
-								<include>**/*TestAPI.java</include>
-							</includes>
-							<systemProperties>
-								<pact.provider.version>${project.version}</pact.provider.version>
-								<pact.verifier.publishResult>${pact.verifier.publishResult}</pact.verifier.publishResult>
-								<pactbroker.host>${pactbroker.host}</pactbroker.host>
-								<pactbroker.port>${pactbroker.port}</pactbroker.port>
-							</systemProperties>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<skipTests>${skipITs}</skipTests>
-				</configuration>
-			</plugin>
-			<!-- this plugin performs http requests directly, meaning we must have a running environment to have the test-->
-			<!-- mvn pact:verify to check pact -->
-			<!-- mvn pact:publish to publish provider pact file -->
-			<!--plugin>
-				<groupId>au.com.dius</groupId>
-				<artifactId>pact-jvm-provider-maven_2.12</artifactId>
-				<version>${pact-jvm-provider.version}</version>
-				<configuration>
-					<pactBrokerUrl>${pactbroker.scheme}://${pactbroker.host}:${pactbroker.port}</pactBrokerUrl>
-					<serviceProviders>
-						<serviceProvider>
-							<name>petstore</name>
-							<pactBrokerUrl>${pactbroker.scheme}://${pactbroker.host}:${pactbroker.port}</pactBrokerUrl>
-						</serviceProvider>
-					</serviceProviders>
-				</configuration>
-			</plugin-->
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- Test pact files using official pact libraries -->
+		<profile>
+			<id>pact</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>integration-test</phase>
+								<goals><goal>integration-test</goal></goals>
+								<configuration>
+									<includes>
+										<include>**/*TestAPI.java</include>
+									</includes>
+									<systemProperties>
+										<pact.provider.version>${project.version}</pact.provider.version>
+										<pact.verifier.publishResults>${pact.verifier.publishResults}</pact.verifier.publishResults>
+										<pactbroker.host>${pactbroker.host}</pactbroker.host>
+										<pactbroker.port>${pactbroker.port}</pactbroker.port>
+									</systemProperties>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- this plugin performs http requests directly, meaning we must have a running environment to have the test-->
+					<!-- mvn pact:verify to check pact -->
+					<!-- mvn pact:publish to publish provider pact file -->
+					<!-- plugin>
+						<groupId>au.com.dius</groupId>
+						<artifactId>pact-jvm-provider-maven_2.12</artifactId>
+						<version>${pact-jvm-provider.version}</version>
+						<configuration>
+							<pactBrokerUrl>${pactbroker.url}</pactBrokerUrl>
+							<serviceProviders>
+								<serviceProvider>
+									<name>petstore</name>
+									<pactBrokerUrl>${pactbroker.url}</pactBrokerUrl>
+								</serviceProvider>
+							</serviceProviders>
+						</configuration>
+					</plugin -->
+				</plugins>
+			</build>
+		</profile>
+		<!-- Testing pact files using spring-cloud-contract tools -->
+		<profile>
+			<id>spring-cloud-contract</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.cloud</groupId>
+						<artifactId>spring-cloud-contract-maven-plugin</artifactId>
+						<version>${spring-cloud-contract.version}</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<phase>integration-test</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- Base class mapping etc. -->
+							<packageWithBaseClasses>lin.louis.poc.pact.petstore.contract.springcloudcontract</packageWithBaseClasses>
+
+							<!-- Pactbroker url to fetch pact files -->
+							<contractsRepositoryUrl>pact://${pactbroker.url}</contractsRepositoryUrl>
+
+							<!-- We reuse the contract dependency section to set up the path
+							to the folder that contains the contract definitions. In our case the
+							path will be /groupId/artifactId/version/contracts -->
+							<contractDependency>
+								<groupId>${project.groupId}</groupId>
+								<artifactId>${project.artifactId}</artifactId>
+								<!-- When + is passed, a latest tag will be applied when fetching pacts -->
+								<version>+</version>
+							</contractDependency>
+
+							<!-- The contracts mode can't be classpath -->
+							<contractsMode>REMOTE</contractsMode>
+						</configuration>
+						<!-- Don't forget to add spring-cloud-contract-pact to the classpath! -->
+						<dependencies>
+							<dependency>
+								<groupId>org.springframework.cloud</groupId>
+								<artifactId>spring-cloud-contract-pact</artifactId>
+								<version>${spring-cloud-contract.version}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -37,7 +37,7 @@ func TestGet_Dog(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  200,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Body:    dsl.Match(dog.Dog{}),
 		})
 
@@ -70,7 +70,7 @@ func TestGet_DogNotExists(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  404,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 		})
 
 	// verify
@@ -99,13 +99,13 @@ func TestAdd_Dog(t *testing.T) {
 		UponReceiving(fmt.Sprintf("a request to add a %s dog whose name is %s", dogType, dogName)).
 		WithRequest(dsl.Request{
 			Method:  "POST",
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Path:    dsl.String(dogsPath),
 			Body:    dsl.Match(dog.Dog{}),
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  201,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Body:    dsl.Match(dog.Dog{}),
 		})
 

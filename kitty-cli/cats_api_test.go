@@ -37,7 +37,7 @@ func TestGet_Cat(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  200,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Body:    dsl.Match(cat.Cat{}),
 		})
 
@@ -70,7 +70,7 @@ func TestGet_CatNotExists(t *testing.T) {
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  404,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 		})
 
 	// verify
@@ -99,13 +99,13 @@ func TestAdd_Cat(t *testing.T) {
 		UponReceiving(fmt.Sprintf("a request to add a %s cat whose name is %s", catType, catName)).
 		WithRequest(dsl.Request{
 			Method:  "POST",
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Path:    dsl.String(catsPath),
 			Body:    dsl.Match(cat.Cat{}),
 		}).
 		WillRespondWith(dsl.Response{
 			Status:  201,
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json;charset=UTF-8")},
 			Body:    dsl.Match(cat.Cat{}),
 		})
 
