@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import au.com.dius.pact.provider.junit.Consumer;
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactBroker;
@@ -13,8 +14,6 @@ import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import au.com.dius.pact.provider.spring.target.SpringBootHttpTarget;
 import lin.louis.poc.pact.petstore.cat.Cat;
 import lin.louis.poc.pact.petstore.cat.CatRepository;
-import lin.louis.poc.pact.petstore.dog.Dog;
-import lin.louis.poc.pact.petstore.dog.DogRepository;
 
 
 /**
@@ -24,19 +23,17 @@ import lin.louis.poc.pact.petstore.dog.DogRepository;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 // provider name must be unique and same as the one defined in the pact broker
 @Provider("petstore")
+// consumer name must be unique and same as the one defined in the pact broker
+@Consumer("kitty-cli")
 // properties are set from Java system properties
 @PactBroker
-public class ContractTestAPI {
+public class CatTestAPI {
+
 	@TestTarget
 	public final Target target = new SpringBootHttpTarget();
 
 	@Autowired
 	private CatRepository catRepository;
-
-	@Autowired
-	private DogRepository dogRepository;
-
-	// CAT -------------------------------------------------------------------------------------------------------------
 
 	@State("there is a cat with an id 88")
 	public void toExistingCat() {
@@ -51,20 +48,4 @@ public class ContractTestAPI {
 
 	@State("creating a Tardar Sauce cat whose name is Grumpy cat")
 	public void toAddCat() {}
-
-	// DOG -------------------------------------------------------------------------------------------------------------
-
-	@State("there is a dog with an id 88")
-	public void toExistingDog() {
-		dogRepository.deleteAll();
-		dogRepository.save(new Dog(88, "Chico", "Shiba Inu"));
-	}
-
-	@State("there is no dog with an id 888")
-	public void toNonExistingDog() {
-		dogRepository.deleteAll();
-	}
-
-	@State("creating a Shiba Inu dog whose name is Chico")
-	public void toAddDog() {}
 }
