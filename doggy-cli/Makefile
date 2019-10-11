@@ -16,11 +16,11 @@ compile: clean get fmt vet test build
 ## release: generate binaries and an archive containing all binaries in bin/ folder
 release: clean get fmt vet test build-all archive
 
-## publish-pact-dev: publishes pact file to pact broker
+## publish-pact-to-dev: publishes pact file to pact broker
 publish-pact-to-dev:
 	@PACT_PUBLISH=true PACT_BROKER_HOST=localhost:9292 PACT_TAGS=dev make compile
 
-## publish-prod: publishes pact file to pact broker
+## publish-pact-to-prod: publishes pact file to pact broker
 publish-pact-to-prod:
 	@PACT_PUBLISH=true PACT_BROKER_HOST=localhost:9292 PACT_TAGS=prod make compile
 
