@@ -1,0 +1,19 @@
+{
+  "name": "doggy-cli",
+  "version": "0.0.1",
+  "description": "Demo project as front consumer",
+  "main": "index.js",
+  "scripts": {
+    "test": "rimraf pacts && mocha",
+    "publish:dev": "PACT_BROKER_URL=http://localhost:9292 PACT_TAG=dev node publish.js",
+    "publish:prod": "PACT_BROKER_URL=http://localhost:9292 PACT_TAG=prod node publish.js"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "^9.2.0",
+    "@pact-foundation/pact-node": "^9.0.6",
+    "axios": "^0.19.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.1",
+    "rimraf": "^3.0.0"
+  }
+}

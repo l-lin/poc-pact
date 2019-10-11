@@ -14,6 +14,7 @@ POC testing:
 - java 11
 - maven
 - golang
+- node 11+
 - docker + docker-compose
 - [pact standalone executables](https://github.com/pact-foundation/pact-ruby-standalone/releases)
 
@@ -106,10 +107,12 @@ popd
 # to implement the corresponding API /dogs.
 # #############################################################################
 pushd doggy-cli
+# Install dependencies
+npm i
 # Build the client.
-make compile
+npm run build
 # Publish the doggy-cli consumer pact file with label "dev".
-make publish-pact-dev
+make run publish:dev
 # Checking that we can't deploy the new cli as the provider still did not verify
 # the pact files.
 pact-broker can-i-deploy -a doggy-cli -b localhost:9292 --latest
