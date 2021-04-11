@@ -224,6 +224,6 @@ maintainers do not plan to add this feature][spring cloud no publish].
 [Publish verification results with a version tag in pact-jvm-provider-spring_2.12]: https://github.com/DiUS/pact-jvm/issues/823
 [test file]: petstore/src/test/java/lin/louis/poc/pact/petstore/contract/ContractTestAPI.java
 [fixed]: https://github.com/DiUS/pact-jvm/issues/799
-[spring-cloud-contract-pact][]: https://cloud.spring.io/spring-cloud-static/spring-cloud-contract/2.1.2.RELEASE/single/spring-cloud-contract.html#_can_i_use_the_pact_broker
+[spring-cloud-contract-pact]: https://cloud.spring.io/spring-cloud-static/spring-cloud-contract/2.1.2.RELEASE/single/spring-cloud-contract.html#_can_i_use_the_pact_broker
 [spring cloud no publish]: https://github.com/spring-cloud/spring-cloud-contract/issues/778#issuecomment-486389490
 
