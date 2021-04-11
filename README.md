@@ -166,7 +166,7 @@ This POC is not using the latest version of pact-jvm (which is 4.0.0-beta6 at
 the time the POC was performed) because this POC is also testing the library
 [swagger-request-validator-pact][] which uses the [3.5.20][pact-version].
 
-[pact-jvm-provider-juni5][] in version 3.5.20 seems to ignore the property
+[pact-jvm-provider-junit5][] in version 3.5.20 seems to ignore the property
 `pact.verifier.publishResults` and always publishes the results to the pact
 broker. However, it's [fixed][] in the version 3.5.24.
 
